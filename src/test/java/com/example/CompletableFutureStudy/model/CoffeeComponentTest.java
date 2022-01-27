@@ -48,7 +48,38 @@ class CoffeeComponentTest {
         assertEquals(expectedPrice, resultPrice);
     }
 
+    @Test
+    public void 가격_조회_비동기_호출_콜백_반환없음_테스트() {
+        int expectedPrice = 1100;
 
+        CompletableFuture<Void> future = coffeeComponent
+            .getPriceAsync("latte")
+            .thenAccept(p -> {
+                log.info("콜백함수, 가격은 " + p + "원, 하지만 데이터를 반환하지 않는다.");
+                assertEquals(expectedPrice, p);
+            });
 
+        log.info("아직 최종 데이터를 받지는 않았지만, 다른 작업 수행가능하다. 논블로킹!");
+        assertNull(future.join());
+    }
+
+    @Test
+    public void 가격_조회_비동기_호출_콜백_반환있음_테스트() {
+        int expectedPrice = 1100 + 100;
+
+        CompletableFuture<Void> future = coffeeComponent
+            .getPriceAsync("latte")
+            .thenApply(p -> {
+                log.info("같은 쓰레드로 동작");
+                return p + 100;
+            })
+            .thenAccept(p -> {
+                log.info("다시 콜백, 가격은 " + p + "원, 하지만 데이터를 반환하지 않는다.");
+                assertEquals(expectedPrice, p);
+            });
+        log.info("아직 최종 데이터를 받지는 않았지만, 다른 작업 수행가능하다. 논블로킹!");
+
+        assertNull(future.join());
+    }
 
 }
