@@ -3,7 +3,6 @@ package com.example.CompletableFutureStudy.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,7 +53,7 @@ class CoffeeComponentTest {
 
         CompletableFuture<Void> future = coffeeComponent
             .getPriceAsync("latte")
-            .thenAccept(p -> {
+            .thenAccept(p -> { // 블로킹되지 않는다. 여기에서 특정 출력 등이 가능하다.
                 log.info("콜백함수, 가격은 " + p + "원, 하지만 데이터를 반환하지 않는다.");
                 assertEquals(expectedPrice, p);
             });
@@ -69,7 +68,7 @@ class CoffeeComponentTest {
 
         CompletableFuture<Void> future = coffeeComponent
             .getPriceAsync("latte")
-            .thenApply(p -> {
+            .thenApply(p -> { // 다른 콜백 함수로 전달 처리도 가능하다.
                 log.info("같은 쓰레드로 동작");
                 return p + 100;
             })
@@ -78,6 +77,22 @@ class CoffeeComponentTest {
                 assertEquals(expectedPrice, p);
             });
         log.info("아직 최종 데이터를 받지는 않았지만, 다른 작업 수행가능하다. 논블로킹!");
+
+        assertNull(future.join());
+    }
+
+    @Test
+    public void 임의_테스트() {
+        int expectedPrice = 1200;
+
+        CompletableFuture<Void> future = coffeeComponent
+            .getPriceAsync("latte")
+            .thenAccept(p -> {
+                log.info("콜백, 반환된 값에 100을 더했다.");
+                assertEquals(p + 100, expectedPrice);
+            });
+
+        log.info("최종데이터를 받기 전 출력될까?");
 
         assertNull(future.join());
     }
