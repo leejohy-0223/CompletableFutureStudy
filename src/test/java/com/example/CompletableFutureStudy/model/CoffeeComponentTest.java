@@ -97,4 +97,20 @@ class CoffeeComponentTest {
         assertNull(future.join());
     }
 
+    @Test
+    public void sync_Async_test() {
+        int expectedPrice = 1200;
+
+        CompletableFuture<Void> future = coffeeComponent
+            .getPriceAsync("latte")
+            .thenAccept(p -> {
+                log.info("then : " + Thread.currentThread().getName());
+                log.info("콜백, 반환된 값에 100을 더했다.");
+                assertEquals(p + 100, expectedPrice);
+            });
+
+        log.info("최종데이터를 받기 전 출력될까?");
+
+        assertNull(future.join());
+    }
 }

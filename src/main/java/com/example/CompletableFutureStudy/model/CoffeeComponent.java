@@ -32,6 +32,7 @@ public class CoffeeComponent implements CoffeeUseCase {
     public CompletableFuture<Integer> getPriceAsync(String name) {
 
         log.info("비동기 호출 방식으로 가격 조회 시작");
+        log.info("in getPriceAsync" + Thread.currentThread().getName());
 
         return CompletableFuture.supplyAsync(() -> {
             log.info("supplyAsync");
